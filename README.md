@@ -1,2 +1,3 @@
 # utilities
-C++ utilities library
+
+C++ utilities library which I use in every project.
