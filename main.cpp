@@ -5,6 +5,7 @@
 #include "include/utils/collections.h"
 #include "include/utils/types.h"
 #include "include/utils/math.h"
+#include "include/utils/unix.h"
 
 // Just empty file to have something to compile
 int main() {}
