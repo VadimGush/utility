@@ -28,7 +28,7 @@ namespace unix {
     static result<vec<u8>, Error> read_file(const char* const path) {
         using result_t = result<vec<u8>, Error>;
 
-        const fd_t fd = open(path, 0);
+        const fd_t fd = open(path, O_RDONLY);
         if (fd == -1) {
             switch (errno) {
                 case EACCES: return result_t::failure(Error::ACCESS_DENIED);

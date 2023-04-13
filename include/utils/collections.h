@@ -80,6 +80,10 @@ public:
         return std::get<0>(variant_);
     }
 
+    const V& value() const {
+        return std::get<0>(variant_);
+    }
+
     const E& failure() const {
         return std::get<1>(variant_);
     }
