@@ -7,5 +7,5 @@
 #include "include/utils/math.h"
 #include "include/utils/unix.h"
 
-// Just empty file to have something to compile
+// Just file to have something to compile
 int main() {}

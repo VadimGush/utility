@@ -13,29 +13,28 @@
 
 namespace unix {
 
-    enum struct Result {
-        SUCCESS = 0,
-        FAILURE = 1,
-        ACCESS_DENIED = 2,
-        FILE_NOT_FOUND = 3,
-        FAILED_TO_READ = 4,
+    enum struct Error {
+        UNKNOWN,
+        ACCESS_DENIED,
+        FILE_NOT_FOUND,
+        FAILED_TO_READ,
     };
 
     /**
      * Opens the file and returns its content
      * @param path path to the file
-     * @param result if operation is successful Result::SUCCESS
      * @return file data if operation is completed
      */
-    static vec<u8> read_file(IN const char* const path, OUT Result* result) {
+    static result<vec<u8>, Error> read_file(const char* const path) {
+        using result_t = result<vec<u8>, Error>;
+
         const fd_t fd = open(path, 0);
         if (fd == -1) {
             switch (errno) {
-                case EACCES: { *result = Result::ACCESS_DENIED; break; }
-                case ENOENT: { *result = Result::FILE_NOT_FOUND; break; }
-                default: *result = Result::FAILURE;
+                case EACCES: return result_t::failure(Error::ACCESS_DENIED);
+                case ENOENT: return result_t::failure(Error::FILE_NOT_FOUND);
+                default: return result_t::failure(Error::UNKNOWN);
             }
-            return {};
         }
         struct stat stat{};
         fstat(fd, &stat);
@@ -44,11 +43,9 @@ namespace unix {
         vec<u8> data(file_size);
         size_t bytes_read = read(fd, data.data(), file_size);
         if (bytes_read != file_size) {
-            *result = Result::FAILED_TO_READ;
-            return {};
+            return result_t::failure(Error::FAILED_TO_READ);
         }
-        *result = Result::SUCCESS;
-        return data;
+        return result_t::success(std::move(data));
     };
 
 }
