@@ -5,9 +5,6 @@
 #ifndef UTILITIES_TYPES_H
 #define UTILITIES_TYPES_H
 
-#define OUT
-#define IN
-
 #include <cstdint>
 
 using u8 = uint8_t;

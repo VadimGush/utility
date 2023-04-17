@@ -1,6 +1,6 @@
 # utilities
 
-C++ utilities library which I use in every project. All headers are placed in `/include/utils` directory.
+C++ header-only utility library which I use in every project. All headers are placed in `/include/utils` directory.
 
  * `types.h` - aliases for primitive types
  * `bits.h` - utils to work with binary values

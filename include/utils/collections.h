@@ -11,6 +11,7 @@
 #include <map>
 #include <unordered_set>
 #include <set>
+#include <string>
 #include <optional>
 
 template <typename T>

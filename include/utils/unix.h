@@ -45,6 +45,7 @@ namespace unix {
         if (bytes_read != file_size) {
             return result_t::failure(Error::FAILED_TO_READ);
         }
+        close(fd);
         return result_t::success(std::move(data));
     };
 
