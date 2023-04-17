@@ -43,6 +43,9 @@ using opt = std::optional<T>;
 template <typename A, typename B>
 using pair = std::pair<A, B>;
 
+template <typename T, int N>
+using arr = std::array<T, N>;
+
 template <typename V, typename E>
 struct result {
 private:
