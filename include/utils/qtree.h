@@ -28,10 +28,26 @@ private:
     node root_{};
 
     void run_(const node& node, const T& value, const visitor& visitor) const {
-        if (inside_check_(value, node.position, node.position + node.size)) {
-            for (const auto& element : node.elements) {
-                visitor(element);
+        for (const auto& element : node.elements) {
+            visitor(element);
+        }
+
+        bool fit = false;
+        for (const auto& child_node_ptr : node.nodes) {
+            if (child_node_ptr != nullptr) {
+                const auto &child_node = *child_node_ptr;
+                if (inside_check_(value, child_node.position, child_node.position + child_node.size)) {
+                    run_(child_node, value, visitor);
+                    fit = true;
+                }
             }
+        }
+
+        // If our point is not inside our children nodes
+        // then we should check it against all of them.
+        // helpful for line intersection checks where line can overlay
+        // multiple regions in quad tree
+        if (!fit) {
             for (const auto& child_node_ptr : node.nodes) {
                 if (child_node_ptr != nullptr) {
                     run_(*child_node_ptr, value, visitor);
@@ -47,7 +63,9 @@ public:
         root_(std::move(root)) { }
 
     void run(const T& value, const std::function<void(const T& element)>& visitor) const {
-        run_(root_, value, visitor);
+        if (inside_check_(value, root_.position, root_.position + root_.size)) {
+            run_(root_, value, visitor);
+        }
     }
 
     static qtree build(vec<T> values,

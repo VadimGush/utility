@@ -14,7 +14,7 @@ TEST(QtreeTest, BasicTest) {
     const auto inside_check = [](const vec2& point, const vec2& start, const vec2& end){
         return point.x >= start.x && point.x < end.x && point.y >= start.y && point.y < end.y;
     };
-    const qtree<vec2> tree = qtree<vec2>::build(points, vec2{100, 100}, 2, inside_check);
+    const auto tree = qtree<vec2>::build(points, vec2{100, 100}, 2, inside_check);
 
     vec<vec2> visits{};
     tree.run(vec2{ 30, 30}, [&](const vec2& element){ visits.push_back(element); });
@@ -34,11 +34,55 @@ TEST(QtreeTest, LotOfPointsTest) {
     const auto inside_check = [](const vec2& point, const vec2& start, const vec2& end){
         return point.x >= start.x && point.x < end.x && point.y >= start.y && point.y < end.y;
     };
-    const qtree<vec2> tree = qtree<vec2>::build(std::move(points), vec2{128, 128}, 4, inside_check);
+    const auto tree = qtree<vec2>::build(std::move(points), vec2{128, 128}, 4, inside_check);
 
     // Only 256 visits
-    vec<vec2> visits{};
-    tree.run(vec2{ 30, 30}, [&](const vec2& element){ visits.push_back(element); });
-    ASSERT_EQ(256, visits.size());
+    i32 visits = 0;
+    tree.run(vec2{ 30, 30}, [&](const vec2& element){ visits += 1; });
+    ASSERT_EQ(256, visits);
+}
+
+TEST(QTreeTest, LineSegmentsTest) {
+    // 16384 lines
+    vec<line2> lines{};
+    for (i32 x = 0; x < 128; x++) {
+        for (i32 y = 0; y < 128; y++) {
+            lines.emplace_back(line2{ .p1 = vec2{x, y}, .p2 = vec2{x, y}});
+        }
+    }
+
+    const auto inside_check = [](const line2& line, const vec2& start, const vec2& end){
+        const bool first_point_inside = line.p1.x >= start.x && line.p1.x < end.x && line.p1.y >= start.y && line.p1.y < end.y;
+        const bool second_point_inside = line.p2.x >= start.x && line.p2.x < end.x && line.p2.y >= start.y && line.p2.y < end.y;
+        return first_point_inside && second_point_inside;
+    };
+    const auto tree = qtree<line2>::build(std::move(lines), vec2{128, 128}, 4, inside_check);
+
+    // intersect only with 4096
+    i32 visits = 0;
+    tree.run(line2{ .p1 = vec2{65, 65}, .p2 = vec2{127, 127} }, [&](const line2& element){ visits += 1; });
+    ASSERT_EQ(4096, visits);
+}
+
+TEST(QTreeTest, LineSegmentsOutsideRootTest) {
+    // 16384 lines
+    vec<line2> lines{};
+    for (i32 x = 0; x < 128; x++) {
+        for (i32 y = 0; y < 128; y++) {
+            lines.emplace_back(line2{ .p1 = vec2{x, y}, .p2 = vec2{x, y}});
+        }
+    }
+
+    const auto inside_check = [](const line2& line, const vec2& start, const vec2& end){
+        const bool first_point_inside = line.p1.x >= start.x && line.p1.x < end.x && line.p1.y >= start.y && line.p1.y < end.y;
+        const bool second_point_inside = line.p2.x >= start.x && line.p2.x < end.x && line.p2.y >= start.y && line.p2.y < end.y;
+        return first_point_inside && second_point_inside;
+    };
+    const auto tree = qtree<line2>::build(std::move(lines), vec2{128, 128}, 4, inside_check);
+
+    // intersect only with 4096
+    i32 visits = 0;
+    tree.run(line2{ .p1 = vec2{200, 200}, .p2 = vec2{210, 210} }, [&](const line2& element){ visits += 1; });
+    ASSERT_EQ(0, visits);
 }
 
