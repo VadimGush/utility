@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "../include/utils/qtree.h"
 
-TEST(QtreeTest, BasicTest) {
+TEST(QtreeTest, qtree_with_couple_of_points) {
     vec<vec2> points{
         vec2{25, 25},
         vec2{75, 75},
@@ -22,7 +22,7 @@ TEST(QtreeTest, BasicTest) {
     ASSERT_EQ(points[0], visits[0]);
 }
 
-TEST(QtreeTest, LotOfPointsTest) {
+TEST(QtreeTest, qtree_with_lot_of_points) {
     // 16384 points
     vec<vec2> points{};
     for (i32 x = 0; x < 128; x++) {
@@ -42,7 +42,7 @@ TEST(QtreeTest, LotOfPointsTest) {
     ASSERT_EQ(256, visits);
 }
 
-TEST(QTreeTest, LineSegmentsTest) {
+TEST(QTreeTest, qtree_correct_behaviour_with_line_intersection) {
     // 16384 lines
     vec<line2> lines{};
     for (i32 x = 0; x < 128; x++) {
@@ -64,7 +64,7 @@ TEST(QTreeTest, LineSegmentsTest) {
     ASSERT_EQ(4096, visits);
 }
 
-TEST(QTreeTest, LineSegmentsOutsideRootTest) {
+TEST(QTreeTest, line_outside_qtree_doesnt_visit_anyting) {
     // 16384 lines
     vec<line2> lines{};
     for (i32 x = 0; x < 128; x++) {

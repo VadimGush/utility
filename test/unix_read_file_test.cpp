@@ -15,7 +15,7 @@ void delete_test_file(const char* const filename) {
     remove(filename);
 }
 
-TEST(UnixTest, ReadFileSuccess) {
+TEST(UnixTest, read_file_returns_success) {
     str actual_content = "Hello world";
     create_test_file("file.txt", actual_content);
 
@@ -28,7 +28,7 @@ TEST(UnixTest, ReadFileSuccess) {
     delete_test_file("file.txt");
 }
 
-TEST(UnixTest, ReadFileFailureFileDoesntExist) {
+TEST(UnixTest, read_file_returns_file_not_found) {
     const result<vec<u8>, unix::Error> result_data = unix::read_file("file.txt");
     ASSERT_FALSE(result_data);
     const auto& failure = result_data.failure();
