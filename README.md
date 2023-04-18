@@ -7,3 +7,4 @@ C++ header-only utility library which I use in every project. All headers are pl
  * `math.h` - aliases for math objects
  * `collections.h` - aliases for C++ collections
  * `unix.h` - wrappers around UNIX system calls
+ * `qtree.h` - quad tree implementation

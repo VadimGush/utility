@@ -80,7 +80,7 @@ TEST(QTreeTest, LineSegmentsOutsideRootTest) {
     };
     const auto tree = qtree<line2>::build(std::move(lines), vec2{128, 128}, 4, inside_check);
 
-    // intersect only with 4096
+    // intersect with 0, because line outside our quad tree
     i32 visits = 0;
     tree.run(line2{ .p1 = vec2{200, 200}, .p2 = vec2{210, 210} }, [&](const line2& element){ visits += 1; });
     ASSERT_EQ(0, visits);
