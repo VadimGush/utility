@@ -4,7 +4,7 @@ C++ header-only utility library which I use in every project. All headers are pl
 
  * `types.h` - aliases for primitive types
  * `bits.h` - utils to work with binary values
- * `math.h` - operations on geometry
+ * `geometry.h` - geometry primitives and aliases
  * `collections.h` - aliases for C++ collections
  * `unix.h` - wrappers around UNIX system calls
  * `qtree.h` - quad tree implementation
