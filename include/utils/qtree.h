@@ -14,8 +14,13 @@
 template <typename T>
 struct qtree {
 private:
-    using inside_check = std::function<bool(const T& t, const vec2& start, const vec2& end)>;
+
+    // Tells if the provided element should be placed inside the node with given position and size
+    using distributor = std::function<bool(const T& t, const vec2& bottom_left, const vec2& top_right)>;
+    // Called when a particular element is visited
     using visitor = std::function<void(const T& element)>;
+    // Tells which node should be visited
+    using selector = std::function<bool(const vec2& bottom_left, const vec2& top_right)>;
 
     struct node {
         vec2 position{};
@@ -24,63 +29,47 @@ private:
         arr<uptr<node>, 4> nodes{};
     };
 
-    inside_check inside_check_{};
+    distributor inside_check_{};
     node root_{};
-
-    void run_(const node& node, const T& value, const visitor& visitor) const {
-        for (const auto& element : node.elements) {
-            visitor(element);
-        }
-
-        bool fit = false;
-        for (const auto& child_node_ptr : node.nodes) {
-            if (child_node_ptr != nullptr) {
-                const auto &child_node = *child_node_ptr;
-                if (inside_check_(value, child_node.position, child_node.position + child_node.size)) {
-                    run_(child_node, value, visitor);
-                    fit = true;
-                }
-            }
-        }
-
-        // If our point is not inside our children nodes
-        // then we should check it against all of them.
-        // helpful for line intersection checks where line can overlay
-        // multiple regions in quad tree
-        if (!fit) {
-            for (const auto& child_node_ptr : node.nodes) {
-                if (child_node_ptr != nullptr) {
-                    run_(*child_node_ptr, value, visitor);
-                }
-            }
-        }
-    }
 
 public:
 
-    qtree(node&& root, const inside_check& inside_check):
+    qtree(node&& root, const distributor& inside_check):
         inside_check_(inside_check),
-        root_(std::move(root)) { }
+        root_(std::move(root)) {
+    }
 
-    void run(const T& value, const std::function<void(const T& element)>& visitor) const {
-        if (inside_check_(value, root_.position, root_.position + root_.size)) {
-            run_(root_, value, visitor);
-        }
+    void select(const selector& selector, const visitor& visitor) const {
+        select_(root_, selector, visitor);
+    }
+
+    void region(const vec2& region_bl, const vec2& region_tr, const visitor& visitor) const {
+        select_(root_, [&](const vec2& node_bl, const vec2& node_tr) {
+            return geometry::overlap(
+                    geometry::rectangle{ region_bl, region_tr },
+                    geometry::rectangle{ node_bl, node_tr });
+        }, visitor);
+    }
+
+    void radius(const vec2& center, const f32 radius, visitor& visitor) const {
+        region(vec2{ center.x - radius, center.y - radius },
+               vec2{ center.x + radius, center.y + radius }, visitor);
     }
 
     static qtree build(vec<T> values,
+                       const vec2 position,
                        const vec2 size,
                        const u32 depth,
-                       const inside_check& inside) {
-        node root{ .position = vec2{}, .size = size, .elements = std::move(values) };
-        build_child_nodes(root, depth, 1, inside);
-        return qtree(std::move(root), inside);
+                       const distributor& distributor) {
+        node root{ .position = position, .size = size, .elements = std::move(values) };
+        build_child_nodes(root, depth, 1, distributor);
+        return qtree(std::move(root), distributor);
     }
 
     static void build_child_nodes(node& n,
                                   const u32 depth,
                                   const u32 current_depth,
-                                  const inside_check& inside) {
+                                  const distributor& distributor) {
         if (depth == current_depth) return;
 
         // create all children nodes
@@ -99,7 +88,7 @@ public:
             bool fit = false;
             for (auto& node_ptr : n.nodes) {
                 auto& node = *node_ptr;
-                if (inside(element, node.position, node.position + node.size)) {
+                if (distributor(element, node.position, node.position + node.size)) {
                     fit = true;
                     node.elements.emplace_back(element);
                     break;
@@ -116,10 +105,26 @@ public:
             if (node.elements.empty()) {
                 node_ptr = nullptr;
             } else {
-                build_child_nodes(node, depth, current_depth + 1, inside);
+                build_child_nodes(node, depth, current_depth + 1, distributor);
             }
         }
     }
+
+private:
+
+    void select_(const node& node, const selector& selector, const visitor& visitor) const {
+        if (selector(node.position, node.position + node.size)) {
+            for (const auto& element : node.elements) {
+                visitor(element);
+            }
+            for (const auto& children_node : node.nodes) {
+                if (children_node != nullptr) {
+                    select_(*children_node, selector, visitor);
+                }
+            }
+        }
+    }
+
 
 };
 
