@@ -23,10 +23,15 @@ namespace geometry {
         P p1{};
         P p2{};
 
+        /**
+         * Checks if a point O projected onto the line falls between P1 and P2.
+         *
+         * @param o point O to project onto the line
+         * @return true if point is between P1 and P2 on the line, otherwise false
+         */
         bool projection_within(const P& o) const {
-            const P dir_o = o - p1;
             const P dir_l = p2 - p1;
-            const f32 t = glm::dot(dir_o, dir_l) / glm::length(dir_l);
+            const f32 t = (glm::dot(o - p1, dir_l) / glm::length(dir_l)) / glm::length(dir_l);
             return t > 0 && t <= 1.f;
         }
     };
@@ -51,19 +56,30 @@ namespace geometry {
     struct plane {
         vec3 position{};
         vec3 normal{};
+
+        static plane from(const triangle<vec3>& tr) {
+            return {.position = tr.p1, .normal = glm::normalize(glm::cross(tr.p2 - tr.p1, tr.p3 - tr.p1))};
+        }
     };
 
     struct rectangle {
         vec2 a{};
         vec2 b{};
 
+        /**
+         * Finds bottom left corner of the rectangle
+         *
+         * @return bottom left corner coordinates
+         */
         vec2 bottom_left() const { return { glm::min(a.x, b.x), glm::min(a.y, b.y) }; }
+
+        /**
+         * Finds top right corner of the rectangle
+         *
+         * @return top right corner coordinates
+         */
         vec2 top_right() const { return { glm::max(a.x, b.x), glm::max(a.y, b.y) }; }
     };
-
-    static plane triangle_to_plane(const triangle<vec3> &tr) {
-        return {.position = tr.p1, .normal = glm::normalize(glm::cross(tr.p2 - tr.p1, tr.p3 - tr.p1))};
-    }
 
     static bool overlap(const rectangle& rect1, const rectangle& rect2) {
         const vec2 rect1_bl = rect1.bottom_left(), rect1_tr = rect1.top_right();
@@ -82,7 +98,7 @@ namespace geometry {
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;
 
         const f32 d = (p1.x-p2.x)*(p3.y-p4.y)-(p1.y-p2.y)*(p3.x-p4.x);
-        if (d < EPSILON) return {};
+        if (d > -EPSILON && d < EPSILON) return {};
 
         return vec2{
                 ((p1.x*p2.y-p1.y*p2.x)*(p3.x-p4.x)-(p1.x-p2.x)*(p3.x*p4.y-p3.y*p4.x))/d,

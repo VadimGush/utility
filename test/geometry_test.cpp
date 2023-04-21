@@ -5,7 +5,7 @@
 #include "../include/utils/geometry.h"
 
 TEST(MathTest, construct_plane_fromt_triangle) {
-    const auto plane = geometry::triangle_to_plane(geometry::triangle3 {
+    const auto plane = geometry::plane::from(geometry::triangle3 {
         .p1 = vec3{ 1, 1, 1 },
         .p2 = vec3{ 2, 1, 1 },
         .p3 = vec3{ 1, 2, 1 } });
@@ -17,7 +17,7 @@ TEST(MathTest, construct_plane_fromt_triangle) {
 }
 
 TEST(MathTest, triangle_intersection_on_edge_with_plane) {
-    const auto plane = geometry::triangle_to_plane(geometry::triangle3{
+    const auto plane = geometry::plane::from(geometry::triangle3{
             .p1 = vec3{ 1, 1, 1 },
             .p2 = vec3{ 2, 1, 1},
             .p3 = vec3{ 1, 2, 1} });
@@ -34,7 +34,7 @@ TEST(MathTest, triangle_intersection_on_edge_with_plane) {
 TEST(MathTest, triangle_has_intersection_with_plane) {
     const f32 EPSILON = 0.000001f;
 
-    const auto plane = geometry::triangle_to_plane(geometry::triangle3{
+    const auto plane = geometry::plane::from(geometry::triangle3{
             .p1 = vec3{ 1, 1, 1 },
             .p2 = vec3{ 2, 1, 1},
             .p3 = vec3{ 1, 2, 1} });
