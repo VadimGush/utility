@@ -34,6 +34,8 @@ private:
 
 public:
 
+    qtree() =default;
+
     qtree(node&& root, const distributor& inside_check):
         inside_check_(inside_check),
         root_(std::move(root)) {
