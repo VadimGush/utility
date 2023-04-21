@@ -22,6 +22,13 @@ namespace geometry {
     struct line {
         P p1{};
         P p2{};
+
+        bool projection_within(const P& o) {
+            const P dir_o = o - p1;
+            const P dir_l = p2 - p1;
+            const f32 t = glm::dot(dir_o, dir_l) / glm::length(dir_l);
+            return t > 0 && t <= 1.f;
+        }
     };
 
     template <typename P>
