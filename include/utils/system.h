@@ -2,16 +2,17 @@
 // Created by Vadim Gush on 13.04.2023.
 //
 
-#ifndef UTILITIES_UNIX_H
-#define UTILITIES_UNIX_H
+#ifndef UTILITIES_SYSTEM_H
+#define UTILITIES_SYSTEM_H
 
 #include "collections.h"
 #include "types.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ctime>
 
-namespace unix {
+namespace sys {
 
     enum struct Error {
         UNKNOWN,
@@ -49,6 +50,16 @@ namespace unix {
         return result_t::success(std::move(data));
     };
 
+    struct clock {
+        clock_t start;
+        clock_t elapsed;
+
+        clock(): start(::clock()) {}
+
+        void complete() { elapsed = ::clock() - start; }
+        f32 ms() const { return static_cast<f32>(elapsed) / (CLOCKS_PER_SEC / 1000); }
+    };
+
 }
 
-#endif //UTILITIES_UNIX_H
+#endif //UTILITIES_SYSTEM_H
