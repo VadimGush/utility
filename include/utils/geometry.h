@@ -23,7 +23,7 @@ namespace geometry {
         P p1{};
         P p2{};
 
-        bool projection_within(const P& o) {
+        bool projection_within(const P& o) const {
             const P dir_o = o - p1;
             const P dir_l = p2 - p1;
             const f32 t = glm::dot(dir_o, dir_l) / glm::length(dir_l);
