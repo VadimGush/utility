@@ -57,6 +57,12 @@ namespace geometry {
         vec3 position{};
         vec3 normal{};
 
+        /**
+         * Construct a plane from the triangle
+         *
+         * @param tr triangle
+         * @return plane
+         */
         static plane from(const triangle<vec3>& tr) {
             return {.position = tr.p1, .normal = glm::normalize(glm::cross(tr.p2 - tr.p1, tr.p3 - tr.p1))};
         }
@@ -81,6 +87,13 @@ namespace geometry {
         vec2 top_right() const { return { glm::max(a.x, b.x), glm::max(a.y, b.y) }; }
     };
 
+    /**
+     * Checks if 2 rectangles overlap each other
+     *
+     * @param rect1 first rectangle
+     * @param rect2 second rectangle
+     * @return true if overlap
+     */
     static bool overlap(const rectangle& rect1, const rectangle& rect2) {
         const vec2 rect1_bl = rect1.bottom_left(), rect1_tr = rect1.top_right();
         const vec2 rect2_bl = rect2.bottom_left(), rect2_tr = rect2.top_right();
@@ -93,6 +106,13 @@ namespace geometry {
         return true;
     }
 
+    /**
+     * Calculates intersection between 2 lines (infinitely long)
+     *
+     * @param l1 first line
+     * @param l2 second line
+     * @return point of intersection or nothing if there is no intersection
+     */
     static opt<vec2> intersection(const line<vec2>& l1, const line<vec2>& l2) {
         constexpr f32 EPSILON = 0.001f;
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;
@@ -105,6 +125,14 @@ namespace geometry {
                 ((p1.x*p2.y-p1.y*p2.x)*(p3.y-p4.y)-(p1.y-p2.y)*(p3.x*p4.y-p3.y*p4.x))/d};
     }
 
+    /**
+     * Calculates intersection between plane and triangle.
+     * WARNING: if one of the sides of the triangle is on the plane, this function will NOT return anything.
+     *
+     * @param plane plane
+     * @param tri triangle
+     * @return line of intersection or nothing if there is no intersection
+     */
     static opt<line<vec3>> intersection(const plane &plane, const triangle<vec3> &tri) {
         constexpr f32 EPSILON = 0.0001f;
 
