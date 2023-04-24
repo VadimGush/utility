@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "../include/utils/geometry.h"
 
-TEST(MathTest, construct_plane_fromt_triangle) {
+TEST(MathTest, construct_plane_from_triangle) {
     const auto plane = geometry::plane::from(geometry::triangle3 {
         .p1 = vec3{ 1, 1, 1 },
         .p2 = vec3{ 2, 1, 1 },
