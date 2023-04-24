@@ -26,11 +26,10 @@ private:
     // Called when a particular element is visited
     using visitor = std::function<void(const T& element)>;
     // Selects which node should be visited
-    using selector = std::function<bool(const vec2& bottom_left, const vec2& top_right)>;
+    using selector = std::function<bool(const geometry::rectangle& box)>;
 
     struct node {
-        vec2 position{};
-        vec2 size{};
+        geometry::rectangle box{};
         vec<T> elements{};
         arr<uptr<node>, 4> nodes{};
     };
@@ -61,10 +60,9 @@ public:
      * @param visitor called per every element in the selected node
      */
     void region(const vec2& region_bl, const vec2& region_tr, const visitor& visitor) const {
-        select_(root_, [&](const vec2& node_bl, const vec2& node_tr) {
-            return geometry::overlap(
-                    geometry::rectangle{ region_bl, region_tr },
-                    geometry::rectangle{ node_bl, node_tr });
+        const geometry::rectangle region_box{ region_bl, region_tr };
+        select_(root_, [&](const geometry::rectangle& node_box) {
+            return geometry::overlap(region_box, node_box);
         }, visitor);
     }
 
@@ -95,7 +93,7 @@ public:
                        const vec2 size,
                        const u32 depth,
                        const distributor& distributor) {
-        node root{ .position = position, .size = size, .elements = std::move(values) };
+        node root{ .box = geometry::rectangle{ position, position + size }, .elements = std::move(values) };
         build_child_nodes_(root, depth, 1, distributor);
         return qtree(std::move(root));
     }
@@ -109,22 +107,26 @@ private:
         if (depth == current_depth) return;
 
         // create all children nodes
-        const vec2 new_size = n.size / 2.f;
+        const vec2 new_size = n.box.size() / 2.f;
         n.nodes[0] = std::make_unique<node>(
-                node{ .position = n.position, .size = new_size });
+                node{ .box = geometry::rectangle{ n.box.bl,
+                                                  n.box.bl + new_size} });
         n.nodes[1] = std::make_unique<node>(
-                node{ .position = n.position + vec2{ new_size.x, 0 }, .size = new_size });
+                node{ .box = geometry::rectangle{ n.box.bl + vec2{ new_size.x, 0 },
+                                                  n.box.bl + vec2{ new_size.x, 0 } + new_size} });
         n.nodes[2] = std::make_unique<node>(
-                node{ .position = n.position + vec2{ 0, new_size.y }, .size = new_size });
+                node{ .box = geometry::rectangle{ n.box.bl + vec2{ 0, new_size.y },
+                                                  n.box.bl + vec2{ 0, new_size.y } + new_size} });
         n.nodes[3] = std::make_unique<node>(
-                node{ .position = n.position + vec2{ new_size.x, new_size.y }, .size = new_size });
+                node{ .box = geometry::rectangle{ n.box.bl + vec2{ new_size.x, new_size.y },
+                                                  n.box.bl + vec2{ new_size.x, new_size.y } + new_size} });
 
         vec<T> left{};
         for (const auto& element : n.elements) {
             bool fit = false;
             for (auto& node_ptr : n.nodes) {
                 auto& node = *node_ptr;
-                if (distributor(element, node.position, node.position + node.size)) {
+                if (distributor(element, node.box.bl, node.box.tr)) {
                     fit = true;
                     node.elements.emplace_back(element);
                     break;
@@ -147,7 +149,7 @@ private:
     }
 
     void select_(const node& node, const selector& selector, const visitor& visitor) const {
-        if (selector(node.position, node.position + node.size)) {
+        if (selector(node.box)) {
             for (const auto& element : node.elements) {
                 visitor(element);
             }

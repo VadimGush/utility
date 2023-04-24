@@ -69,22 +69,16 @@ namespace geometry {
     };
 
     struct rectangle {
-        vec2 a{};
-        vec2 b{};
+        vec2 bl{};
+        vec2 tr{};
 
-        /**
-         * Finds bottom left corner of the rectangle
-         *
-         * @return bottom left corner coordinates
-         */
-        vec2 bottom_left() const { return { glm::min(a.x, b.x), glm::min(a.y, b.y) }; }
+        rectangle() =default;
 
-        /**
-         * Finds top right corner of the rectangle
-         *
-         * @return top right corner coordinates
-         */
-        vec2 top_right() const { return { glm::max(a.x, b.x), glm::max(a.y, b.y) }; }
+        rectangle(const vec2& a, const vec2& b):
+            bl{ glm::min(a.x, b.x), glm::min(a.y, b.y) },
+            tr{ glm::max(a.x, b.x), glm::max(a.y, b.y) } {}
+
+        vec2 size() const { return tr - bl; }
     };
 
     /**
@@ -95,14 +89,10 @@ namespace geometry {
      * @return true if overlap
      */
     static bool overlap(const rectangle& rect1, const rectangle& rect2) {
-        const vec2 rect1_bl = rect1.bottom_left(), rect1_tr = rect1.top_right();
-        const vec2 rect2_bl = rect2.bottom_left(), rect2_tr = rect2.top_right();
-
-        if (rect1_bl.y >= rect2_tr.y) return false;
-        if (rect1_tr.y <= rect2_bl.y) return false;
-        if (rect1_tr.x <= rect2_bl.x) return false;
-        if (rect1_bl.x >= rect2_tr.x) return false;
-
+        if (rect1.bl.y >= rect2.tr.y) return false;
+        if (rect1.tr.y <= rect2.bl.y) return false;
+        if (rect1.tr.x <= rect2.bl.x) return false;
+        if (rect1.bl.x >= rect2.tr.x) return false;
         return true;
     }
 
@@ -136,8 +126,6 @@ namespace geometry {
      * @return line of intersection or nothing if there is no intersection
      */
     static opt<line<vec3>> intersection(const plane &plane, const triangle<vec3> &tri) {
-        // constexpr f32 EPSILON = 0.0001f;
-
         const vec3 p1p2 = tri.p2 - tri.p1;
         const vec3 p1p3 = tri.p3 - tri.p1;
         const vec3 p2p3 = tri.p3 - tri.p2;
@@ -146,14 +134,12 @@ namespace geometry {
         const vec3 p1p3_n = glm::normalize(p1p3);
         const vec3 p2p3_n = glm::normalize(p2p3);
 
-        // opt<vec3> p1{}, p2{};
         opt<vec3> p1{};
 
         f32 int_p1p2_distance = 0;
         const bool int_p1p2 = glm::intersectRayPlane(tri.p1, p1p2_n, plane.position, plane.normal, int_p1p2_distance);
         if (int_p1p2 && int_p1p2_distance < glm::length(p1p2) && int_p1p2_distance > 0) {
             p1 = tri.p1 + (p1p2_n * int_p1p2_distance);
-            // if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
         }
 
         f32 int_p1p3_distance = 0;
@@ -162,7 +148,6 @@ namespace geometry {
             const vec3 intersection = tri.p1 + (p1p3_n * int_p1p3_distance);
             if (p1) { return geometry::line3{ *p1, intersection }; }
             p1 = intersection;
-            // if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
         }
 
         f32 int_p2p3_distance = 0;
@@ -170,42 +155,7 @@ namespace geometry {
         if (int_p2p3 && int_p2p3_distance < glm::length(p2p3) && int_p2p3_distance > 0) {
             const vec3 intersection = tri.p2 + (p2p3_n * int_p2p3_distance);
             if (p1) { return geometry::line3{ *p1, intersection }; }
-            // if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
         }
-
-        /*
-        if (glm::abs(glm::dot(p1p2_n, plane.normal)) > EPSILON) {
-            f32 p1p2_distance = 0;
-            const bool p1p2 = glm::intersectRayPlane(tri.p1, p1p2_n, plane.position, plane.normal, p1p2_distance);
-            if (p1p2 && p1p2_distance < glm::length(tri.p2 - tri.p1) && p1p2_distance > 0) {
-                const vec3 intersection = tri.p1 + (p1p2_n * p1p2_distance);
-                if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
-            }
-        }
-        if (glm::abs(glm::dot(p1p3_n, plane.normal)) > EPSILON) {
-            f32 int_p1p3_distance = 0;
-            const bool p1p3 = glm::intersectRayPlane(tri.p1, p1p3_n, plane.position, plane.normal, int_p1p3_distance);
-            if (p1p3 && int_p1p3_distance < glm::length(tri.p3 - tri.p1) && int_p1p3_distance > 0) {
-                const vec3 intersection = tri.p1 + (p1p3_n * int_p1p3_distance);
-                if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
-            }
-        }
-        if (glm::abs(glm::dot(p2p3_n, plane.normal)) > EPSILON) {
-            f32 int_p2p3_distance = 0;
-            const bool p2p3 = glm::intersectRayPlane(tri.p2, p2p3_n, plane.position, plane.normal, int_p2p3_distance);
-            if (p2p3 && int_p2p3_distance < glm::length(tri.p3 - tri.p2) && int_p2p3_distance > 0) {
-                const vec3 intersection = tri.p2 + (p2p3_n * int_p2p3_distance);
-                if (!p1.has_value()) { p1 = intersection; } else { p2 = intersection; }
-            }
-        }
-         */
-
-        /*
-        if (p1.has_value() && p2.has_value()) {
-            if (glm::distance(*p1, *p2) < EPSILON) return {};
-            return { line<vec3>{*p1, *p2} };
-        }
-         */
         return {};
     }
 }
