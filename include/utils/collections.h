@@ -23,17 +23,23 @@ using uptr = std::unique_ptr<T>;
 template <typename T>
 using sptr = std::shared_ptr<T>;
 
-template <typename K, typename V>
-using umap = std::unordered_map<K, V>;
+template <typename K, typename V, typename H = std::hash<K>>
+using umap = std::unordered_map<K, V, H>;
 
 template <typename K, typename V>
 using map = std::map<K, V>;
+
+template <typename K, typename V>
+using mmap = std::multimap<K, V>;
 
 template <typename K, typename H = std::hash<K>>
 using uset = std::unordered_set<K, H>;
 
 template <typename K>
 using set = std::set<K>;
+
+template <typename K>
+using mset = std::multiset<K>;
 
 using str = std::string;
 
