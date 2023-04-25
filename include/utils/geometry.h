@@ -22,18 +22,6 @@ namespace geometry {
     struct line {
         P p1{};
         P p2{};
-
-        /**
-         * Checks if a point O projected onto the line falls between P1 and P2.
-         *
-         * @param o point O to project onto the line
-         * @return true if point is between P1 and P2 on the line, otherwise false
-         */
-        bool projection_within(const P& o) const {
-            const P dir_l = p2 - p1;
-            const f32 t = (glm::dot(o - p1, dir_l) / glm::length(dir_l)) / glm::length(dir_l);
-            return t > 0 && t <= 1.f;
-        }
     };
 
     template <typename P>
@@ -125,7 +113,6 @@ namespace geometry {
         constexpr f32 EPSILON = 0.001f;
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;
 
-        // First
         const f32 a1 = p2.y - p1.y;
         const f32 b1 = p1.x - p2.x;
         const f32 c1 = p2.x * p1.y - p1.x * p2.y;
@@ -133,7 +120,6 @@ namespace geometry {
         const f32 r4 = a1 * p4.x + b1 * p4.y + c1;
         if  (!eq_zero(r3, EPSILON) && !eq_zero(r4, EPSILON) && same_sign(r3, r4)) return {};
 
-        // Second
         const f32 a2 = p4.y - p3.y;
         const f32 b2 = p3.x - p4.x;
         const f32 c2 = p4.x * p3.y - p3.x * p4.y;
@@ -144,13 +130,12 @@ namespace geometry {
         const f32 d = a1 * b2 - b1 * a2;
         if (eq_zero(d, EPSILON)) return {};
 
-        const f32 m1 = c1;
-        const f32 m2 = c2;
-        return vec2{( b1 * m2 - m1 * b2 ) / d, (m1 * a2 - a1 * m2) / d};
+        return vec2{( b1 * c2 - c1 * b2 ) / d, (c1 * a2 - a1 * c2) / d};
     }
 
     /**
      * Checks if 2 line segments have intersection
+     *
      * @param l1 first line
      * @param l2 second line
      * @return true if they have intersection
@@ -159,7 +144,6 @@ namespace geometry {
         constexpr f32 EPSILON = 0.001f;
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;
 
-        // First
         const f32 a1 = p2.y - p1.y;
         const f32 b1 = p1.x - p2.x;
         const f32 c1 = p2.x * p1.y - p1.x * p2.y;
@@ -167,7 +151,6 @@ namespace geometry {
         const f32 r4 = a1 * p4.x + b1 * p4.y + c1;
         if  (!eq_zero(r3, EPSILON) && !eq_zero(r4, EPSILON) && same_sign(r3, r4)) return false;
 
-        // Second
         const f32 a2 = p4.y - p3.y;
         const f32 b2 = p3.x - p4.x;
         const f32 c2 = p4.x * p3.y - p3.x * p4.y;
