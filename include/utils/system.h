@@ -50,6 +50,9 @@ namespace sys {
         return result_t::success(std::move(data));
     };
 
+    /**
+     * Measures time. Works with fractions of milliseconds.
+     */
     struct clock {
         clock_t start;
         clock_t elapsed;

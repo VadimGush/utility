@@ -12,8 +12,7 @@
 #include <iostream>
 
 /**
- * Quad-tree. This implementation is not very efficient because it uses quite a lot
- * of memory allocations and all data is randomly distributes across the memory. Which is not cache-friendly.
+ * Quad-tree implementation. Works good enough.
  *
  * @tparam T type of stored elements
  */
@@ -73,18 +72,6 @@ public:
     void region(const vec2& region_bl, const vec2& region_tr, const visitor& visitor) const {
         const geometry::rectangle region_box{ region_bl, region_tr };
         region_(nodes_[0], region_box, visitor);
-    }
-
-    /**
-     * Every temp_node which is inside of the given radius will be visited.
-     *
-     * @param center center of the region
-     * @param radius radius
-     * @param visitor called per every element in the selected temp_node
-     */
-    void radius(const vec2& center, const f32 radius, visitor& visitor) const {
-        region(vec2{ center.x - radius, center.y - radius },
-               vec2{ center.x + radius, center.y + radius }, visitor);
     }
 
     /**
@@ -195,7 +182,7 @@ private:
     void region_(const node& node, const geometry::rectangle& region, const visitor& visitor) const {
         const bool inside = node.box.inside_of(region);
         if (inside) {
-            // Is our node is fully inside the provided region we don't want
+            // If our node is fully inside the provided region we don't want
             // to spend time visiting every child node in tree. Instead, we will just select
             // all elements at once.
             visitor(&elements_[node.elements_start_id], node.elements_total_size);
