@@ -16,7 +16,7 @@ TEST(QtreeTest, qtree_with_lot_of_points) {
     const auto inside_check = [](const vec2& point, const vec2& start, const vec2& end){
         return point.x >= start.x && point.x < end.x && point.y >= start.y && point.y < end.y;
     };
-    const auto tree = qtree<vec2>::build(std::move(points), vec2{}, vec2{128, 128}, 4, inside_check);
+    const auto tree = qtree<vec2>::build(std::move(points), vec2{}, vec2{128, 128}, 4, 0, inside_check);
 
     // Only 256 visits
     u32 elements = 0;
@@ -36,7 +36,7 @@ TEST(QtreeTest, qtree_negative_position) {
     const auto inside_check = [](const vec2& point, const vec2& start, const vec2& end){
         return point.x >= start.x && point.x < end.x && point.y >= start.y && point.y < end.y;
     };
-    const auto tree = qtree<vec2>::build(std::move(points), vec2{-64, -64}, vec2{128, 128}, 4, inside_check);
+    const auto tree = qtree<vec2>::build(std::move(points), vec2{-64, -64}, vec2{128, 128}, 4, 0, inside_check);
 
     // Only 256 visits
     u32 elements = 0;
@@ -58,7 +58,7 @@ TEST(QTreeTest, line_outside_qtree_doesnt_visit_anyting) {
         const bool second_point_inside = line.p2.x >= start.x && line.p2.x < end.x && line.p2.y >= start.y && line.p2.y < end.y;
         return first_point_inside && second_point_inside;
     };
-    const auto tree = qtree<geometry::line2>::build(std::move(lines), vec2{}, vec2{128, 128}, 4, inside_check);
+    const auto tree = qtree<geometry::line2>::build(std::move(lines), vec2{}, vec2{128, 128}, 4, 0, inside_check);
 
     u32 elements = 0;
     tree.region(vec2{128, 128}, vec2{200,200}, [&](const auto* ptr, const u32 size){ elements += size; });

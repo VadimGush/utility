@@ -94,6 +94,7 @@ public:
      * @param position position of quad-tree in space
      * @param size size of quad-tree in space
      * @param depth depth of the tree
+     * @param min_elements minimum amount of elements that can be in the node
      * @param distributor function to tell which element should be place in which temp_node
      * @return quad-tree ready to use
      */
@@ -101,12 +102,13 @@ public:
                        const vec2 position,
                        const vec2 size,
                        const u32 depth,
+                       const u32 min_elements,
                        const distributor& distributor) {
         const u32 total_elements = values.size();
         temp_node root{ .box = geometry::rectangle{position, position + size },
                         .elements = std::move(values),
                         .total_elements = total_elements };
-        build_child_nodes_(root, depth, 1, distributor);
+        build_child_nodes_(root, depth, 1, min_elements, distributor);
 
         vec<T> elements{};
         elements.reserve(total_elements);
@@ -142,8 +144,10 @@ private:
     static void build_child_nodes_(temp_node& n,
                                    const u32 depth,
                                    const u32 current_depth,
+                                   const u32 min_elements,
                                    const distributor& distributor) {
         if (depth == current_depth) return;
+        if (n.elements.size() <= min_elements) return;
 
         // create all children nodes
         const vec2 new_size = n.box.size() / 2.f;
@@ -160,24 +164,22 @@ private:
                 temp_node{ .box = geometry::rectangle{ n.box.bl + vec2{ new_size.x, new_size.y },
                                                   n.box.bl + vec2{ new_size.x, new_size.y } + new_size} });
 
-        if (n.elements.size() > 1) {
-            vec<T> left{};
-            for (const auto& element : n.elements) {
-                bool fit = false;
-                for (auto& node_ptr : n.nodes) {
-                    auto& node = *node_ptr;
-                    if (distributor(element, node.box.bl, node.box.tr)) {
-                        fit = true;
-                        node.elements.emplace_back(element);
-                        break;
-                    }
-                }
-                if (!fit) {
-                    left.emplace_back(element);
+        vec<T> left{};
+        for (const auto& element : n.elements) {
+            bool fit = false;
+            for (auto& node_ptr : n.nodes) {
+                auto& node = *node_ptr;
+                if (distributor(element, node.box.bl, node.box.tr)) {
+                    fit = true;
+                    node.elements.emplace_back(element);
+                    break;
                 }
             }
-            n.elements = std::move(left);
+            if (!fit) {
+                left.emplace_back(element);
+            }
         }
+        n.elements = std::move(left);
 
         for (auto& node_ptr : n.nodes) {
             auto& node = *node_ptr;
@@ -185,7 +187,7 @@ private:
                 node_ptr = nullptr;
             } else {
                 node.total_elements = node.elements.size();
-                build_child_nodes_(node, depth, current_depth + 1, distributor);
+                build_child_nodes_(node, depth, current_depth + 1, min_elements, distributor);
             }
         }
     }
