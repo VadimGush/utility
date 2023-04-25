@@ -53,6 +53,9 @@ namespace geometry {
     using line3 = line<vec3>;
     using line2 = line<vec2>;
 
+    /**
+     * 3D plane which defined by the position and the normal.
+     */
     struct plane {
         vec3 position{};
         vec3 normal{};
@@ -68,6 +71,9 @@ namespace geometry {
         }
     };
 
+    /**
+     * 2D rectangle
+     */
     struct rectangle {
         vec2 bl{};
         vec2 tr{};
