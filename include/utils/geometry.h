@@ -109,7 +109,7 @@ namespace geometry {
     }
 
     /**
-     * Calculates intersection between 2 lines (infinitely long)
+     * Calculates intersection between 2 lines segments
      *
      * @param l1 first line
      * @param l2 second line
@@ -143,6 +143,12 @@ namespace geometry {
         return vec2{( b1 * m2 - m1 * b2 ) / d, (m1 * a2 - a1 * m2) / d};
     }
 
+    /**
+     * Checks if 2 line segments have intersection
+     * @param l1 first line
+     * @param l2 second line
+     * @return true if they have intersection
+     */
     static bool has_intersection(const line<vec2>& l1, const line<vec2>& l2) {
         constexpr f32 EPSILON = 0.001f;
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;

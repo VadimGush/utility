@@ -29,8 +29,8 @@ using umap = std::unordered_map<K, V>;
 template <typename K, typename V>
 using map = std::map<K, V>;
 
-template <typename K>
-using uset = std::unordered_set<K>;
+template <typename K, typename H = std::hash<K>>
+using uset = std::unordered_set<K, H>;
 
 template <typename K>
 using set = std::set<K>;
