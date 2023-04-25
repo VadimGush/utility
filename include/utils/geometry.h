@@ -135,16 +135,12 @@ namespace geometry {
         const f32 r2 = a2 * p2.x + b2 * p2.y + c2;
         if  (!eq_zero(r1, EPSILON) && !eq_zero(r2, EPSILON) && same_sign(r1, r2)) return {};
 
-        const f32 d = b1 * (-a2) - (-a1) * b2;
+        const f32 d = a1 * b2 - b1 * a2;
         if (eq_zero(d, EPSILON)) return {};
 
-        // const f32 m1 = p1.x * p2.y - p1.y * p2.x;
-        // const f32 m2 = p3.x * p4.y - p3.y * p4.x;
-        const f32 m1 = -c1;
-        const f32 m2 = -c2;
-        return vec2{
-                (m1 * b2 - (b1) * m2) / d,
-                (m1 * (-a2) - (-a1) * m2) / d};
+        const f32 m1 = c1;
+        const f32 m2 = c2;
+        return vec2{( b1 * m2 - m1 * b2 ) / d, (m1 * a2 - a1 * m2) / d};
     }
 
     /**
