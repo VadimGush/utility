@@ -79,6 +79,10 @@ namespace geometry {
             tr{ glm::max(a.x, b.x), glm::max(a.y, b.y) } {}
 
         vec2 size() const { return tr - bl; }
+
+        bool inside_of(const rectangle& other) const {
+            return bl.x >= other.bl.x && bl.y >= other.bl.y && tr.x <= other.tr.x && tr.y <= other.tr.y;
+        }
     };
 
     /**
@@ -139,7 +143,7 @@ namespace geometry {
         f32 int_p1p2_distance = 0;
         const bool int_p1p2 = glm::intersectRayPlane(tri.p1, p1p2_n, plane.position, plane.normal, int_p1p2_distance);
         if (int_p1p2 && int_p1p2_distance < glm::length(p1p2) && int_p1p2_distance > 0) {
-            p1 = tri.p1 + (p1p2_n * int_p1p2_distance);
+            p1.emplace(tri.p1 + (p1p2_n * int_p1p2_distance));
         }
 
         f32 int_p1p3_distance = 0;
@@ -147,7 +151,7 @@ namespace geometry {
         if (int_p1p3 && int_p1p3_distance < glm::length(p1p3) && int_p1p3_distance > 0) {
             const vec3 intersection = tri.p1 + (p1p3_n * int_p1p3_distance);
             if (p1) { return geometry::line3{ *p1, intersection }; }
-            p1 = intersection;
+            p1.emplace(intersection);
         }
 
         f32 int_p2p3_distance = 0;

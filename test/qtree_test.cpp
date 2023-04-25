@@ -19,9 +19,9 @@ TEST(QtreeTest, qtree_with_lot_of_points) {
     const auto tree = qtree<vec2>::build(std::move(points), vec2{}, vec2{128, 128}, 4, inside_check);
 
     // Only 256 visits
-    i32 visits = 0;
-    tree.region(vec2{0,0}, vec2{16,16}, [&](const vec2& element){ visits += 1; });
-    ASSERT_EQ(256, visits);
+    u32 elements = 0;
+    tree.region(vec2{0,0}, vec2{16,16}, [&](const vec2* ptr, const u32 size){ elements += size; });
+    ASSERT_EQ(256, elements);
 }
 
 TEST(QtreeTest, qtree_negative_position) {
@@ -39,9 +39,9 @@ TEST(QtreeTest, qtree_negative_position) {
     const auto tree = qtree<vec2>::build(std::move(points), vec2{-64, -64}, vec2{128, 128}, 4, inside_check);
 
     // Only 256 visits
-    i32 visits = 0;
-    tree.region(vec2{64,64}, vec2{64-16, 64-16}, [&](const vec2& element){ visits += 1; });
-    ASSERT_EQ(256, visits);
+    u32 elements = 0;
+    tree.region(vec2{64,64}, vec2{64-16, 64-16}, [&](const vec2* ptr, const u32 size){ elements += size; });
+    ASSERT_EQ(256, elements);
 }
 
 TEST(QTreeTest, line_outside_qtree_doesnt_visit_anyting) {
@@ -60,8 +60,8 @@ TEST(QTreeTest, line_outside_qtree_doesnt_visit_anyting) {
     };
     const auto tree = qtree<geometry::line2>::build(std::move(lines), vec2{}, vec2{128, 128}, 4, inside_check);
 
-    i32 visits = 0;
-    tree.region(vec2{128, 128}, vec2{200,200}, [&](const auto& element){ visits += 1; });
-    ASSERT_EQ(0, visits);
+    u32 elements = 0;
+    tree.region(vec2{128, 128}, vec2{200,200}, [&](const auto* ptr, const u32 size){ elements += size; });
+    ASSERT_EQ(0, elements);
 }
 
