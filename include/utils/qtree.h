@@ -160,22 +160,24 @@ private:
                 temp_node{ .box = geometry::rectangle{ n.box.bl + vec2{ new_size.x, new_size.y },
                                                   n.box.bl + vec2{ new_size.x, new_size.y } + new_size} });
 
-        vec<T> left{};
-        for (const auto& element : n.elements) {
-            bool fit = false;
-            for (auto& node_ptr : n.nodes) {
-                auto& node = *node_ptr;
-                if (distributor(element, node.box.bl, node.box.tr)) {
-                    fit = true;
-                    node.elements.emplace_back(element);
-                    break;
+        if (n.elements.size() > 1) {
+            vec<T> left{};
+            for (const auto& element : n.elements) {
+                bool fit = false;
+                for (auto& node_ptr : n.nodes) {
+                    auto& node = *node_ptr;
+                    if (distributor(element, node.box.bl, node.box.tr)) {
+                        fit = true;
+                        node.elements.emplace_back(element);
+                        break;
+                    }
+                }
+                if (!fit) {
+                    left.emplace_back(element);
                 }
             }
-            if (!fit) {
-                left.emplace_back(element);
-            }
+            n.elements = std::move(left);
         }
-        n.elements = std::move(left);
 
         for (auto& node_ptr : n.nodes) {
             auto& node = *node_ptr;
