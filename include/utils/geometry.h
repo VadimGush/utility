@@ -100,6 +100,14 @@ namespace geometry {
         return true;
     }
 
+    static bool same_sign(const f32 a, const f32 b) {
+        return a * b >= 0.f;
+    }
+
+    static bool eq_zero(const f32 a, const f32 EPSILON) {
+        return a > -EPSILON && a < EPSILON;
+    }
+
     /**
      * Calculates intersection between 2 lines (infinitely long)
      *
@@ -111,8 +119,24 @@ namespace geometry {
         constexpr f32 EPSILON = 0.001f;
         const vec2& p1 = l1.p1, p2 = l1.p2, p3 = l2.p1, p4 = l2.p2;
 
+        // First
+        const f32 a1 = p2.y - p1.y;
+        const f32 b1 = p1.x - p2.x;
+        const f32 c1 = p2.x * p1.y - p1.x * p2.y;
+        const f32 r3 = a1 * p3.x + b1 * p3.y + c1;
+        const f32 r4 = a1 * p4.x + b1 * p4.y + c1;
+        if  (!eq_zero(r3, EPSILON) && !eq_zero(r4, EPSILON) && same_sign(r3, r4)) return {};
+
+        // Second
+        const f32 a2 = p4.y - p3.y;
+        const f32 b2 = p3.x - p4.x;
+        const f32 c2 = p4.x * p3.y - p3.x * p4.y;
+        const f32 r1 = a2 * p1.x + b2 * p1.y + c2;
+        const f32 r2 = a2 * p2.x + b2 * p2.y + c2;
+        if  (!eq_zero(r1, EPSILON) && !eq_zero(r2, EPSILON) && same_sign(r1, r2)) return {};
+
         const f32 d = (p1.x-p2.x)*(p3.y-p4.y)-(p1.y-p2.y)*(p3.x-p4.x);
-        if (d > -EPSILON && d < EPSILON) return {};
+        if (eq_zero(d, EPSILON)) return {};
 
         const f32 m1 = p1.x*p2.y-p1.y*p2.x;
         const f32 m2 = p3.x*p4.y-p3.y*p4.x;

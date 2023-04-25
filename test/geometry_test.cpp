@@ -122,3 +122,46 @@ TEST(GeometryTest, rectangles_overlap) {
     ASSERT_TRUE(r5);
 }
 
+TEST(GeometryTest, lines_intersect) {
+    constexpr f32 EPSILON = 0.0001f;
+
+    const auto intersection = geometry::intersection(
+            geometry::line2{vec2{-5, -5}, vec2{5, 5}}, geometry::line2{vec2{-5, 5}, vec2{5, -5}});
+
+    ASSERT_TRUE(intersection.has_value());
+    ASSERT_TRUE(glm::distance(vec2{0,0}, *intersection) < EPSILON);
+}
+
+TEST(GeometryTest, lines_intersect_2) {
+    constexpr f32 EPSILON = 0.0001f;
+
+    const auto intersection = geometry::intersection(
+            geometry::line2{vec2{0, 1}, vec2{1, 0}}, geometry::line2{vec2{0, 0}, vec2{1, 1}});
+
+    ASSERT_TRUE(intersection.has_value());
+    ASSERT_TRUE(glm::distance(vec2{0.5f,0.5f}, *intersection) < EPSILON);
+}
+
+TEST(GeometryTest, lines_dont_intersect_1) {
+    const auto intersection = geometry::intersection(
+            geometry::line2{vec2{-10, -10}, vec2{-5, -5}}, geometry::line2{vec2{-5, 5}, vec2{5, -5}});
+
+    ASSERT_FALSE(intersection.has_value());
+}
+
+TEST(GeometryTest, lines_dont_intersect_2) {
+    const auto intersection = geometry::intersection(
+            geometry::line2{vec2{-5, 5}, vec2{5, -5}},
+            geometry::line2{vec2{-10, -10}, vec2{-5, -5}});
+
+    ASSERT_FALSE(intersection.has_value());
+}
+
+TEST(GeometryTest, lines_dont_intersect_3) {
+    const auto intersection = geometry::intersection(
+            geometry::line2{vec2{-5, -5}, vec2{0, 0}},
+            geometry::line2{vec2{-1, -1}, vec2{5, 5}});
+
+    ASSERT_FALSE(intersection.has_value());
+}
+
