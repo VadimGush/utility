@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <ctime>
+#include <chrono>
 
 namespace sys {
 
@@ -50,17 +50,27 @@ namespace sys {
         return result_t::success(std::move(data));
     };
 
+
     /**
-     * Measures time. Works with fractions of milliseconds.
+     * Measures time.
      */
+    template <typename T = f32, typename S = std::micro>
     struct clock {
-        clock_t start;
-        clock_t elapsed;
+        using duration = std::chrono::duration<T, S>;
+        using clock_type = std::chrono::high_resolution_clock;
 
-        clock(): start(::clock()) {}
+        std::chrono::time_point<clock_type, duration> start_{};
+        std::chrono::time_point<clock_type, duration> end_{};
 
-        void complete() { elapsed = ::clock() - start; }
-        f32 ms() const { return static_cast<f32>(elapsed) / (CLOCKS_PER_SEC / 1000); }
+        clock() { start_ = clock_type::now(); }
+        void complete() { end_ = clock_type::now(); }
+
+        T milli() const { return std::chrono::duration_cast<std::chrono::duration<T, std::milli>>(end_ - start_).count(); }
+        T micro() const { return std::chrono::duration_cast<std::chrono::duration<T, std::micro>>(end_ - start_).count(); }
+        T nano() const { return std::chrono::duration_cast<std::chrono::duration<T, std::nano>>(end_ - start_).count(); }
+
+        T ms() const { return milli(); }
+        T ns() const { return nano(); }
     };
 
 }
