@@ -26,4 +26,10 @@ constexpr static u32 KB = 1024;
 constexpr static u32 MB = 1024 * KB;
 constexpr static u32 GB = 1024 * MB;
 
+template <typename T>
+struct milliseconds { T value; };
+
+template <typename T>
+struct seconds { T value; };
+
 #endif //UTILITIES_TYPES_H

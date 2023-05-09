@@ -56,7 +56,7 @@ namespace sys {
      */
     template <typename T = f32, typename S = std::micro>
     struct clock {
-        using duration = std::chrono::duration<T, S>;
+        using duration = std::chrono::duration<f64, S>;
         using clock_type = std::chrono::high_resolution_clock;
 
         std::chrono::time_point<clock_type, duration> start_{};
