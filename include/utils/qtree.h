@@ -53,25 +53,36 @@ public:
     qtree(vec<T> elements, vec<node> nodes): elements_(std::move(elements)), nodes_(std::move(nodes)) {}
 
     /**
-     * Select nodes in quad tree and calls visitor per every element in this temp_node
+     * Select nodes in quad tree and calls visitor per every element in this node
      *
      * @param selector function which tells which nodes should be selected
-     * @param visitor called per every element in the selected temp_node
+     * @param visitor called per every element in the selected node
      */
     void select(const selector& selector, const visitor& visitor) const {
         select_(nodes_[0], selector, visitor);
     }
 
     /**
-     * Every temp_node which is inside of defined region will be visited.
+     * Every node which is inside of defined region will be visited.
      *
      * @param region_bl bottom-left corner of the region
      * @param region_tr top-right corner of the region
-     * @param visitor called per every element in the selected temp_node
+     * @param visitor called per every element in the selected node
      */
     void region(const vec2& region_bl, const vec2& region_tr, const visitor& visitor) const {
         const geometry::rectangle region_box{ region_bl, region_tr };
         region_(nodes_[0], region_box, visitor);
+    }
+
+    /**
+     * Every node which is inside of the given radius will be visited.
+     *
+     * @param center center of the region
+     * @param radius radius of the region
+     * @param visitor called per every element in the selected node
+     */
+    void radius(const vec2& center, const f32 radius, const visitor& visitor) const {
+        region(center - vec2{radius, radius}, center + vec2{radius, radius}, visitor);
     }
 
     /**
