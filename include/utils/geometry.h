@@ -15,6 +15,7 @@ using vec2 = glm::vec2;
 using vec3 = glm::vec3;
 using vec4 = glm::vec4;
 using quat = glm::quat;
+using mat4 = glm::mat4x4;
 
 namespace geometry {
 
@@ -77,6 +78,12 @@ namespace geometry {
         bool inside_of(const rectangle& other) const {
             return bl.x >= other.bl.x && bl.y >= other.bl.y && tr.x <= other.tr.x && tr.y <= other.tr.y;
         }
+
+        const vec2& top_right() const { return tr; }
+        vec2 top_left() const { return vec2{ bl.x, tr.y }; }
+
+        const vec2& bottom_left() const { return bl; }
+        vec2 bottom_right() const { return vec2{ tr.x, bl.y }; }
     };
 
     /**
@@ -118,14 +125,14 @@ namespace geometry {
         const f32 c1 = p2.x * p1.y - p1.x * p2.y;
         const f32 r3 = a1 * p3.x + b1 * p3.y + c1;
         const f32 r4 = a1 * p4.x + b1 * p4.y + c1;
-        if  (!eq_zero(r3, EPSILON) && !eq_zero(r4, EPSILON) && same_sign(r3, r4)) return {};
+        if (r3 * r4 > EPSILON * EPSILON) return {};
 
         const f32 a2 = p4.y - p3.y;
         const f32 b2 = p3.x - p4.x;
         const f32 c2 = p4.x * p3.y - p3.x * p4.y;
         const f32 r1 = a2 * p1.x + b2 * p1.y + c2;
         const f32 r2 = a2 * p2.x + b2 * p2.y + c2;
-        if  (!eq_zero(r1, EPSILON) && !eq_zero(r2, EPSILON) && same_sign(r1, r2)) return {};
+        if (r1 * r2 > EPSILON * EPSILON) return {};
 
         const f32 d = a1 * b2 - b1 * a2;
         if (eq_zero(d, EPSILON)) return {};
@@ -149,19 +156,17 @@ namespace geometry {
         const f32 c1 = p2.x * p1.y - p1.x * p2.y;
         const f32 r3 = a1 * p3.x + b1 * p3.y + c1;
         const f32 r4 = a1 * p4.x + b1 * p4.y + c1;
-        if  (!eq_zero(r3, EPSILON) && !eq_zero(r4, EPSILON) && same_sign(r3, r4)) return false;
+        if (r3 * r4 > EPSILON * EPSILON) return false;
 
         const f32 a2 = p4.y - p3.y;
         const f32 b2 = p3.x - p4.x;
         const f32 c2 = p4.x * p3.y - p3.x * p4.y;
         const f32 r1 = a2 * p1.x + b2 * p1.y + c2;
         const f32 r2 = a2 * p2.x + b2 * p2.y + c2;
-        if  (!eq_zero(r1, EPSILON) && !eq_zero(r2, EPSILON) && same_sign(r1, r2)) return false;
+        if (r1 * r2 > EPSILON * EPSILON) return false;
 
         const f32 d = a1 * b2 - b1 * a2;
-        if (eq_zero(d, EPSILON)) return false;
-
-        return true;
+        return !eq_zero(d, EPSILON);
     }
 
     /**

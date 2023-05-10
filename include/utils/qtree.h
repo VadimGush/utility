@@ -85,6 +85,19 @@ public:
         region(center - vec2{radius, radius}, center + vec2{radius, radius}, visitor);
     }
 
+    void trace(const geometry::line2& line, const visitor& visitor) const {
+        select_(nodes_[0], [&](const geometry::rectangle& b){
+            bool i = geometry::has_intersection(geometry::line2{ b.bottom_left(), b.bottom_right() }, line);
+            if (i) { return true; }
+            i = geometry::has_intersection(geometry::line2{ b.bottom_left(), b.top_left() }, line);
+            if (i) { return true; }
+            i = geometry::has_intersection(geometry::line2{ b.top_left(), b.top_right() }, line);
+            if (i) { return true; }
+            i = geometry::has_intersection(geometry::line2{ b.top_right(), b.bottom_right()}, line);
+            return i;
+        }, visitor);
+    }
+
     /**
      * Builds quad-tree
      *
