@@ -12,7 +12,7 @@
 #include <iostream>
 
 /**
- * Quad-tree implementation. Works good enough.
+ * Static quad-tree.
  *
  * @tparam T type of stored elements
  */
@@ -99,6 +99,22 @@ public:
             i = geometry::has_intersection(geometry::line2{ b.top_right(), b.bottom_right()}, line);
             return i;
         }, visitor);
+    }
+
+    typename vec<T>::const_iterator begin() const {
+        return elements_.begin();
+    }
+
+    typename vec<T>::const_iterator end() const {
+        return elements_.end();
+    }
+
+    size_t size() const {
+        return elements_.size();
+    }
+
+    const T& operator[](const size_t i) const {
+        return elements_[i];
     }
 
     /**

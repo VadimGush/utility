@@ -2,6 +2,7 @@
 // Created by Vadim Gush on 17.04.2023.
 //
 #include <gtest/gtest.h>
+#include <algorithm>
 #include "../include/utils/qtree.h"
 
 TEST(QtreeTest, qtree_with_lot_of_points) {
@@ -63,5 +64,29 @@ TEST(QTreeTest, line_outside_qtree_doesnt_visit_anyting) {
     u32 elements = 0;
     tree.region(vec2{128, 128}, vec2{200,200}, [&](const auto* ptr, const u32 size){ elements += size; });
     ASSERT_EQ(0, elements);
+}
+
+TEST(QtreeTest, qtree_iterators) {
+    vec<vec2> points{};
+    for (i32 x = -10; x < 10; x++) {
+        for (i32 y = -10; y < 10; y++) {
+            points.emplace_back(x, y);
+        }
+    }
+
+    const auto inside_check = [](const vec2& point, const vec2& start, const vec2& end){
+        return point.x >= start.x && point.x < end.x && point.y >= start.y && point.y < end.y; };
+    const auto tree = qtree<vec2>::build(points, vec2{}, vec2{128, 128}, 4, 0, inside_check);
+
+    ASSERT_EQ(points.size(), tree.size());
+    for (const auto& point : tree) {
+        const auto iterator = std::find(points.begin(), points.end(), point);
+        ASSERT_TRUE(iterator != points.end());
+    }
+
+    for (u32 i = 0; i < tree.size(); i++) {
+        const auto iterator = std::find(points.begin(), points.end(), tree[i]);
+        ASSERT_TRUE(iterator != points.end());
+    }
 }
 
