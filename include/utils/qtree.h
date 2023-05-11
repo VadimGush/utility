@@ -86,8 +86,11 @@ public:
     }
 
     void trace(const geometry::line2& line, const visitor& visitor) const {
+        const geometry::rectangle line_bound{line.p1, line.p2};
         select_(nodes_[0], [&](const geometry::rectangle& b){
-            bool i = geometry::has_intersection(geometry::line2{ b.bottom_left(), b.bottom_right() }, line);
+            bool i = line_bound.inside_of(b);
+            if (i) { return true; }
+            i = geometry::has_intersection(geometry::line2{ b.bottom_left(), b.bottom_right() }, line);
             if (i) { return true; }
             i = geometry::has_intersection(geometry::line2{ b.bottom_left(), b.top_left() }, line);
             if (i) { return true; }
