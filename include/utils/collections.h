@@ -13,12 +13,16 @@
 #include <set>
 #include <string>
 #include <optional>
+#include <queue>
 
-template <typename T>
-using vec = std::vector<T>;
+template <typename T, typename A = std::allocator<T>>
+using vec = std::vector<T, A>;
 
 template <typename T>
 using uptr = std::unique_ptr<T>;
+
+template <typename T, typename C = std::less<typename std::vector<T>::value_type>, typename A = std::allocator<T>>
+using vec_priority_queue = std::priority_queue<T, std::vector<T, A>, C>;
 
 template <typename T>
 using sptr = std::shared_ptr<T>;

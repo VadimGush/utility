@@ -6,6 +6,7 @@
 #include "../include/utils/qtree.h"
 
 TEST(QtreeTest, qtree_with_lot_of_points) {
+
     // 16384 points
     vec<vec2> points{};
     for (i32 x = 0; x < 128; x++) {
