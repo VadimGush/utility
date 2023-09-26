@@ -5,7 +5,7 @@
 #ifndef UTILITIES_GRAPH_H
 #define UTILITIES_GRAPH_H
 
-#include "types.h"
+#include "../types.h"
 #include "geometry.h"
 
 /**

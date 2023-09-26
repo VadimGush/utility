@@ -2,7 +2,7 @@
 // Created by Vadim Gush on 18.04.2023.
 //
 #include <gtest/gtest.h>
-#include "../include/utils/geometry.h"
+#include "../include/utils/complex/geometry.h"
 
 TEST(MathTest, construct_plane_from_triangle) {
     const auto plane = geometry::plane::from(geometry::triangle3 {

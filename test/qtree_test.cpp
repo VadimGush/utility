@@ -3,7 +3,7 @@
 //
 #include <gtest/gtest.h>
 #include <algorithm>
-#include "../include/utils/qtree.h"
+#include "../include/utils/complex/qtree.h"
 
 TEST(QtreeTest, qtree_with_lot_of_points) {
 

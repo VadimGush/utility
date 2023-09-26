@@ -16,6 +16,9 @@ void delete_test_file(const char* const filename) {
 }
 
 TEST(SystemTest, read_file_returns_success) {
+    const auto start = clock();
+    sys::clock sys_clock{};
+
     str actual_content = "Hello world";
     create_test_file("file.txt", actual_content);
 
@@ -26,6 +29,13 @@ TEST(SystemTest, read_file_returns_success) {
     ASSERT_EQ(content, actual_content);
 
     delete_test_file("file.txt");
+
+    sys_clock.complete();
+    const auto end = clock();
+    const auto duration = (end - start) / (CLOCKS_PER_SEC / 1'000'000);
+
+    std::cout << "nano: " << sys_clock.nano() << std::endl;
+    std::cout << "nano: " << duration << std::endl;
 }
 
 TEST(SystemTest, read_file_returns_file_not_found) {

@@ -1,11 +1,8 @@
-//
-// Created by Vadim Gush on 12.04.2023.
-//
-
 #ifndef UTILITIES_TYPES_H
 #define UTILITIES_TYPES_H
 
-#include <cstdint>
+#include <stdint.h>
+#include <stdlib.h>
 
 using u8 = uint8_t;
 using u16 = uint16_t;
@@ -25,11 +22,5 @@ using fd_t = int;
 constexpr static u32 KB = 1024;
 constexpr static u32 MB = 1024 * KB;
 constexpr static u32 GB = 1024 * MB;
-
-template <typename T>
-struct milliseconds { T value; };
-
-template <typename T>
-struct seconds { T value; };
 
 #endif //UTILITIES_TYPES_H

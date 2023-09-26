@@ -5,7 +5,7 @@
 #ifndef UTILITIES_QUAD_TREE_H
 #define UTILITIES_QUAD_TREE_H
 
-#include "types.h"
+#include "../types.h"
 #include "collections.h"
 #include "geometry.h"
 

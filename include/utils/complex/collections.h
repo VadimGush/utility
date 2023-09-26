@@ -15,6 +15,8 @@
 #include <optional>
 #include <queue>
 
+// TODO(vadim): Every one of them should accept an allocator
+
 template <typename T, typename A = std::allocator<T>>
 using vec = std::vector<T, A>;
 

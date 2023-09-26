@@ -2,7 +2,7 @@
 // Created by Vadim Gush on 13.04.2023.
 //
 #include <gtest/gtest.h>
-#include "../include/utils/collections.h"
+#include "../include/utils/complex/collections.h"
 
 TEST(ResultTest, result_returns_true_on_success) {
     auto r = result<int, int>::success(1);
